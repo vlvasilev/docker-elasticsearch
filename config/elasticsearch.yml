@@ -10,15 +10,11 @@ node:
 
 processors: ${PROCESSORS:1}
 
-network.host: ${NETWORK_HOST}
+network.host: ${NETWORK_HOST:0.0.0.0}
 
 path:
-  data: /data/data
+  data: ${PATH_DATA:/data/data}
   logs: /data/log
-  repo: ${REPO_LOCATIONS}
-
-bootstrap:
-  memory_lock: ${MEMORY_LOCK}
 
 http:
   enabled: ${HTTP_ENABLE}
@@ -29,6 +25,33 @@ http:
 
 discovery:
   zen:
+    ping.unicast.hosts: ${DISCOVERY_SERVICE}
     minimum_master_nodes: ${NUMBER_OF_MASTERS}
 
 xpack.ml.enabled: false
+
+transport.tcp.port: ${TRANSPORT_PORT}
+http.port: ${HTTP_PORT}
+
+indices:
+  memory:
+    index_buffer_size: ${INDEX_BUFFER_SIZE}
+
+thread_pool:
+  index:
+    queue_size: ${INDEX_QUEUE_SIZE}
+
+# disable disk allocation
+cluster:
+  routing:
+    allocation:
+      disk:
+        threshold_enabled: ${ALLOW_DISK_ALLOCATION}
+        watermark:
+          # this is the threshold to move shard to other node
+          # (which we don't have in single node mode so put it to 100%)
+          high : ${DISK_WATERMARK_HIGHT}
+          #threshold for read only lock
+          flood_stage: ${DISK_WATERMARK_FLOOD_STAGE}
+      #for single node only allow only primary shard. We don't need replica
+      enable: ${SHARD_REBALANCING_FOR}
